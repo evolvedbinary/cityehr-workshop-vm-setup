@@ -1,5 +1,5 @@
 ###
-# Puppet Script for Google Chrome on Ubuntu 22.04
+# Puppet Script for Google Chrome on Ubuntu 24.04
 ###
 
 exec { 'download-google-chrome-deb':
@@ -9,10 +9,9 @@ exec { 'download-google-chrome-deb':
   require => Package['wget'],
 }
 
-exec { 'install-google-chrome-deb':
-  command => '/usr/bin/dpkg -i /tmp/google-chrome-stable_current_amd64.deb',
-  unless  => '/usr/bin/dpkg -s google-chrome-stable',
-  user    => 'root',
+package { 'google-chrome-stable':
+  ensure  => installed,
+  source  => '/tmp/google-chrome-stable_current_amd64.deb',
   require => [
     Package['desktop'],
     Exec['download-google-chrome-deb'],
@@ -29,7 +28,7 @@ file { 'google-chrome-desktop-shortcut':
   require => [
     Package['desktop'],
     File['default_user_desktop_folder'],
-    Exec['install-google-chrome-deb'],
+    Package['google-chrome-stable'],
   ],
 }
 
@@ -41,4 +40,13 @@ exec { 'gvfs-trust-google-chrome-desktop-shortcut':
     'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus',
   ],
   require     => File['google-chrome-desktop-shortcut'],
+}
+
+ini_setting { 'google-chrome-desktop-shortcut-position':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/desktop-items-0.conf",
+  section => 'google-chrome.desktop',
+  setting => 'pos',
+  value   => '@Point(139 138)',
+  require => File['google-chrome-desktop-shortcut'],
 }

@@ -1,5 +1,5 @@
 ###
-# Puppet Script to build and install Guacamole Server on Ubuntu 22.04
+# Puppet Script to build and install Guacamole Server on Ubuntu 24.04
 ###
 
 $guacamole_server_source_folder = "/home/${default_user}/code/guacamole-server"

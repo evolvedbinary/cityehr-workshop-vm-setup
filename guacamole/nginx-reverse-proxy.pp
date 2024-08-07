@@ -1,5 +1,5 @@
 ###
-# Puppet Script to reverse-proxy Guacamole Client with Nginx on Ubuntu 22.04
+# Puppet Script to reverse-proxy Guacamole Client with Nginx on Ubuntu 24.04
 ###
 
 include ufw

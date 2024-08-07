@@ -1,11 +1,11 @@
 ###
-# Puppet Script for a Base System on Ubuntu 22.04
+# Puppet Script for a Base System on Ubuntu 24.04
 ###
 
 include ufw
 
 # Set the version of Ubuntu
-$ubuntu_version = '22.04'
+$ubuntu_version = '24.04'
 $default_user = 'ubuntu'
 
 # setup automatic security updates
@@ -13,10 +13,14 @@ package { 'unattended-upgrades':
   ensure => installed,
 }
 
+$apt_auto_upgrades = @("APT_AUTO_UPGRADES_EOF"/L)
+  APT::Periodic::Update-Package-Lists "1";
+  APT::Periodic::Unattended-Upgrade "1";
+  | APT_AUTO_UPGRADES_EOF
+
 file { '/etc/apt/apt.conf.d/20auto-upgrades':
   ensure  => file,
-  content => 'APT::Periodic::Update-Package-Lists "1";
-APT::Periodic::Unattended-Upgrade "1";',
+  content => $apt_auto_upgrades,
   owner   => 'root',
   group   => 'root',
   mode    => '0644',
@@ -94,7 +98,7 @@ file { 'default_user_code_folder':
   ],
 }
 
-ssh_authorized_key { 'xmldev':
+ssh_authorized_key { 'cityehrwork':
   ensure  => present,
   user    => $default_user,
   type    => 'ssh-ed25519',

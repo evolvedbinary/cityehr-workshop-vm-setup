@@ -1,5 +1,5 @@
 ###
-# Puppet Script for IntelliJ IDEA CE on Ubuntu 22.04
+# Puppet Script for IntelliJ IDEA CE on Ubuntu 24.04
 ###
 
 $intellij_idea_version = '2023.3.3'
@@ -31,22 +31,25 @@ file { '/opt/idea-IC':
   require => File["/opt/idea-IC-${intellij_idea_version}"],
 }
 
+$intellij_desktop_shortcut = @("INTELLIJ_DESKTOP_ENTRY_EOF"/L)
+  [Desktop Entry]
+  Version=1.0
+  Type=Application
+  Name=IntelliJ IDEA CE
+  Exec=/opt/idea-IC/bin/idea.sh
+  Icon=/opt/idea-IC/bin/idea.svg
+  Terminal=false
+  StartupNotify=false
+  GenericName=IntelliJ IDEA CE
+  | INTELLIJ_DESKTOP_ENTRY_EOF
+
 file { 'intellij-desktop-shortcut':
   ensure  => file,
   path    => "/home/${default_user}/Desktop/intellij.desktop",
   owner   => $default_user,
   group   => $default_user,
   mode    => '0644',
-  content => "[Desktop Entry]
-Version=1.0
-Type=Application
-Name=IntelliJ IDEA CE
-Exec=/opt/idea-IC/bin/idea.sh
-Icon=/opt/idea-IC/bin/idea.svg
-Terminal=false
-StartupNotify=false
-GenericName=IntelliJ IDEA CE
-",
+  content => $intellij_desktop_shortcut,
   require => [
     Package['desktop'],
     File['default_user_desktop_folder'],
@@ -62,4 +65,13 @@ exec { 'gvfs-trust-intellij-desktop-shortcut':
     'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus',
   ],
   require     => File['intellij-desktop-shortcut'],
+}
+
+ini_setting { 'intellij-desktop-shortcut-position':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/desktop-items-0.conf",
+  section => 'intellij.desktop',
+  setting => 'pos',
+  value   => '@Point(266 390)',
+  require => File['intellij-desktop-shortcut'],
 }

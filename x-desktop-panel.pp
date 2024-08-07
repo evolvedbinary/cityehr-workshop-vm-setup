@@ -1,5 +1,5 @@
 ###
-# Puppet Script for configuring LXQT Panel Shortcuts on Ubuntu 22.04
+# Puppet Script for configuring LXQT Panel Shortcuts on Ubuntu 24.04
 ###
 
 file { 'dot-config':
@@ -63,6 +63,7 @@ $panel_conf = @("PANEL_EOF"/L)
   [quicklaunch]
   alignment=Left
   apps\1\desktop=/home/${default_user}/Desktop/google-chrome.desktop
+  apps\1\desktop=/home/${default_user}/Desktop/firefox.desktop
   apps\2\desktop=/home/${default_user}/Desktop/qterminal.desktop
   apps\3\desktop=/home/${default_user}/Desktop/pcmanfm-qt.desktop
   apps\size=3
@@ -106,5 +107,6 @@ file { 'panel':
     Package['desktop'],
     File['dot-config-lxqt'],
     File['google-chrome-desktop-shortcut'],
+    File['firefox-desktop-shortcut'],
   ],
 }

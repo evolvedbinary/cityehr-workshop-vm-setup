@@ -1,5 +1,5 @@
 ###
-# Puppet Script for setting locale on Ubuntu 22.04
+# Puppet Script for setting locale on Ubuntu 24.04
 ###
 
 # Set the language

@@ -1,6 +1,8 @@
 ###
-# Puppet Script for a Desktop Developer Environment using LXQT on Ubuntu 22.04
+# Puppet Script for a Desktop Developer Environment using LXQT on Ubuntu 24.04
 ###
+
+$desktop_background_image = "/home/${default_user}/Pictures/cityehrwork-desktop-background.png"
 
 file { 'disable-screensaver':
   ensure  => file,
@@ -42,6 +44,52 @@ file { 'default_user_desktop_folder':
   require => [
     Package['desktop'],
     File['default_user_home'],
+  ],
+}
+
+exec { 'download-desktop-background':
+  command => "curl https://static.evolvedbinary.com/cityehr/cityehrwork-desktop-background.png -o ${desktop_background_image}",
+  path    => '/usr/bin',
+  user    => $default_user,
+  creates => $desktop_background_image,
+  require => [
+    File['default_user_desktop_folder'],
+  ],
+}
+
+ini_setting { 'desktop_background_image':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/settings.conf",
+  section => 'Desktop',
+  setting => 'Wallpaper',
+  value   => $desktop_background_image,
+  require => [
+    Package['desktop'],
+    Exec['download-desktop-background'],
+  ],
+}
+
+ini_setting { 'desktop_background_mode':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/settings.conf",
+  section => 'Desktop',
+  setting => 'WallpaperMode',
+  value   => 'fit',
+  require => [
+    Package['desktop'],
+    Exec['download-desktop-background'],
+  ],
+}
+
+ini_setting { 'desktop_background_color':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/settings.conf",
+  section => 'Desktop',
+  setting => 'BgColor',
+  value   => '#f8e5bd',
+  require => [
+    Package['desktop'],
+    Exec['download-desktop-background'],
   ],
 }
 
@@ -149,3 +197,24 @@ exec { 'gvfs-trust-lxqt-archiver-desktop-shortcut':
   ],
   require     => File['lxqt-archiver-desktop-shortcut'],
 }
+
+# Position the Desktop icons
+inifile::create_ini_settings( {
+    'computer.desktop'      => { 'pos' => '@Point(12 12)' },
+    'user-home.desktop'     => { 'pos' => '@Point(12 138)' },
+    'network.desktop'       => { 'pos' => '@Point(12 264)' },
+    'trash-can.desktop'     => { 'pos' => '@Point(12 390)' },
+    'pcmanfm-qt.desktop'    => { 'pos' => '@Point(12 516)' },
+    'lxqt-archiver.desktop' => { 'pos' => '@Point(12 642)' },
+    'qterminal.desktop'     => { 'pos' => '@Point(12 768)' },
+  }, {
+    ensure => present,
+    path => "/home/${default_user}/.config/pcmanfm-qt/lxqt/desktop-items-0.conf",
+    require => [
+      Package['desktop'],
+      File['pcmanfm-qt-desktop-shortcut'],
+      File['lxqt-archiver-desktop-shortcut'],
+      File['qterminal-desktop-shortcut'],
+    ]
+  }
+)

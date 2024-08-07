@@ -1,5 +1,5 @@
 ###
-# Puppet Script for VSCode on Ubuntu 22.04
+# Puppet Script for VSCode on Ubuntu 24.04
 ###
 
 exec { 'download-vscode-deb':
@@ -8,10 +8,9 @@ exec { 'download-vscode-deb':
   require => Package['curl'],
 }
 
-exec { 'install-vscode-deb':
-  command => '/usr/bin/dpkg -i /tmp/vscode.deb',
-  unless  => '/usr/bin/dpkg -s code',
-  user    => 'root',
+package { 'code':
+  ensure  => installed,
+  source  => '/tmp/vscode.deb',
   require => [
     Package['desktop'],
     Exec['download-vscode-deb'],
@@ -23,7 +22,7 @@ file_line { 'vscode-no-open-folder':
   path    => '/usr/share/applications/code.desktop',
   line    => 'MimeType=text/plain;application/x-code-workspace;',
   match   => '^MimeType\=',
-  require => Exec['install-vscode-deb'],
+  require => Package['code'],
 }
 
 file { 'vscode-desktop-shortcut':
@@ -48,4 +47,13 @@ exec { 'gvfs-trust-vscode-desktop-shortcut':
     'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus',
   ],
   require     => File['vscode-desktop-shortcut'],
+}
+
+ini_setting { 'vscode-desktop-shortcut-position':
+  ensure  => present,
+  path    => "/home/${default_user}/.config/pcmanfm-qt/lxqt/desktop-items-0.conf",
+  section => 'code.desktop',
+  setting => 'pos',
+  value   => '@Point(139 768)',
+  require => File['vscode-desktop-shortcut'],
 }

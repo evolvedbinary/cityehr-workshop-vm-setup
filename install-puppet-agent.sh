@@ -24,6 +24,7 @@ fi
 /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
 /opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
 /opt/puppetlabs/bin/puppet module install puppetlabs-augeas_core
+/opt/puppetlabs/bin/puppet module install puppetlabs-inifile
 /opt/puppetlabs/bin/puppet module install puppet-nginx
 /opt/puppetlabs/bin/puppet module install puppet-letsencrypt
 
